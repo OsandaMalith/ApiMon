@@ -1,0 +1,218 @@
+$$ ApiMon -  A simple API Monitor for Windbg
+$$ Author : Osanda Malith Jayathissa (@OsandaMalith)
+$$ E-Mail: osanda[cat]unseen.is
+$$ Website: https://osandamalith.com 
+
+aS LogPath @"C:\temp\Output.txt";
+
+.catch {
+
+	.if ${/d:$arg1} == 0 {
+		.printf "Usage: ApiMon.wds run; g;";
+		.leave;
+	}
+
+	.if @@masm(not($scmp("${$arg1}", "run"))) {
+		 .logopen /t ${LogPath};
+		.if @@c++(((unsigned char *)&@$PEB->BeingDebugged)[0]) == @@masm(0y1) {
+			r? $t5 = @@c++((unsigned long *)&@$PEB->BeingDebugged);
+			eb $t5 @@masm(0y0);
+		}
+
+		.if @@c++(((unsigned char *)&@$PEB->NtGlobalFlag)[0]) == @@masm(0y1110000) {
+			r? $t6 = @@c++((unsigned long *)&@$PEB->NtGlobalFlag);
+			eb $t6 @@masm(0y0);
+		}
+
+		$$ Registry
+		bp Advapi32!RegOpenKeyA @"$$>a<${$arg0} RegOpenKeyA";
+		bp Advapi32!RegOpenKeyW @"$$>a<${$arg0} RegOpenKeyW";
+
+		bp Kernelbase!RegOpenKeyExA @"$$>a<${$arg0} RegOpenKeyExA";
+		bp Kernelbase!RegOpenKeyExW @"$$>a<${$arg0} RegOpenKeyExW";
+
+		bp Kernelbase!RegQueryValueExA @"$$>a<${$arg0} RegQueryValueExA";
+		bp Kernelbase!RegQueryValueExW @"$$>a<${$arg0} RegQueryValueExW";		
+
+		bp Advapi32!RegQueryValueA @"$$>a<${$arg0} RegQueryValueA";
+		bp Advapi32!RegQueryValueW @"$$>a<${$arg0} RegQueryValueW";
+
+		bp Advapi32!RegCopyTreeA @"$$>a<${$arg0} RegCopyTreeA";
+		bp Kernelbase!RegCopyTreeW @"$$>a<${$arg0} RegCopyTreeW";
+
+		bp Kernelbase!RegCreateKeyExA  @"$$>a<${$arg0} RegCreateKeyExA";
+		bp Kernelbase!RegCreateKeyExW @"$$>a<${$arg0} RegCreateKeyExW";	
+
+		bp Advapi32!RegDeleteKeyA @"$$>a<${$arg0} RegDeleteKeyA";
+		bp Advapi32!RegDeleteKeyW @"$$>a<${$arg0} RegDeleteKeyW";
+
+		bp Advapi32!RegDeleteKeyValueA @"$$>a<${$arg0} RegDeleteKeyValueA";
+		bp Advapi32!RegDeleteKeyValueW @"$$>a<${$arg0} RegDeleteKeyValueW";
+
+		bp Kernelbase!RegDeleteKeyExA  @"$$>a<${$arg0} RegDeleteKeyExA";
+		bp Kernelbase!RegDeleteKeyExW @"$$>a<${$arg0} RegDeleteKeyExW";		
+
+		bp Advapi32!RegDeleteKeyTransactedA @"$$>a<${$arg0} RegDeleteKeyTransactedA";
+		bp Advapi32!RegDeleteKeyTransactedW @"$$>a<${$arg0} RegDeleteKeyTransactedW";	
+
+		bp Kernelbase!RegDeleteTreeA @"$$>a<${$arg0} RegDeleteTreeA";
+		bp Kernelbase!RegDeleteTreeW @"$$>a<${$arg0} RegDeleteTreeW";	
+
+		bp Kernelbase!RegDeleteValueA @"$$>a<${$arg0} RegDeleteValueA";
+		bp Kernelbase!RegDeleteValueW @"$$>a<${$arg0} RegDeleteValueW";	
+
+		bp Kernelbase!RegRestoreKeyA @"$$>a<${$arg0} RegRestoreKeyA";
+		bp Kernelbase!RegRestoreKeyW @"$$>a<${$arg0} RegRestoreKeyW";	
+
+		bp Advapi32!RegReplaceKeyA @"$$>a<${$arg0} RegReplaceKeyA";
+		bp Advapi32!RegReplaceKeyW @"$$>a<${$arg0} RegReplaceKeyW";	
+
+		bp Advapi32!RegSaveKeyA @"$$>a<${$arg0} RegSaveKeyA";
+		bp Advapi32!RegSaveKeyW @"$$>a<${$arg0} RegSaveKeyW";	
+
+		$$ File Operations
+		bp kernelbase!CreateFileA @"$$>a<${$arg0} CreateFileA 1";
+		bp kernelbase!CreateFileW @"$$>a<${$arg0} CreateFileW 1";
+		
+		bp kernelbase!DeleteFileA @"$$>a<${$arg0} DeleteFileW 1";
+		bp kernelbase!DeleteFileW @"$$>a<${$arg0} DeleteFileW 1";
+
+		bp kernelbase!FindFirstFileA @"$$>a<${$arg0} FindFirstFileA 1";
+		bp kernelbase!FindFirstFileW @"$$>a<${$arg0} FindFirstFileW 1";
+
+		bp kernel32!MoveFileA @"$$>a<${$arg0} MoveFileA 1";
+		bp kernel32!MoveFileW @"$$>a<${$arg0} MoveFileW 1";
+
+		bp kernelbase!GetFileAttributesA @"$$>a<${$arg0} GetFileAttributesA 1";
+
+		bp kernelbase!GetFileAttributesExA @"$$>a<${$arg0} GetFileAttributesExA 1";
+		bp kernelbase!GetFileAttributesExW @"$$>a<${$arg0} GetFileAttributesExW 1";
+
+		bp kernel32!CopyFileA @"$$>a<${$arg0} CopyFileA 1";
+		bp kernel32!CopyFileW @"$$>a<${$arg0} CopyFileW 1";
+
+		bp kernel32!GetTempPathA @"$$>a<${$arg0} GetTempPathA 2";
+		bp kernelbase!GetTempPathW @"$$>a<${$arg0} GetTempPathW 2";
+
+		$$ Networking APIs
+		bp WS2_32!connect @"$$>a<${$arg0} connect";
+		bp WS2_32!bind @"$$>a<${$arg0} bind";
+		bp WS2_32!WSAConnect @"$$>a<${$arg0} WSAConnect";
+		
+		bp WS2_32!gethostname @"$$>a<${$arg0} gethostname 1";
+		bp WS2_32!gethostbyname @"$$>a<${$arg0} gethostbyname 1";
+		
+		bp WININET!FtpPutFileA @"$$>a<${$arg0} FtpPutFileA 2";
+		bp WININET!FtpPutFileW @"$$>a<${$arg0} FtpPutFileW 2";
+
+		bp WININET!InternetOpenA @"$$>a<${$arg0} InternetOpenA 1";
+		bp WININET!InternetOpenW @"$$>a<${$arg0} InternetOpenW 1";
+
+		$$ Others
+		bp kernel32!CreateMutexA @"$$>a<${$arg0} CreateMutexA 3";
+		bp kernel32!CreateMutexW @"$$>a<${$arg0} CreateMutexW 3";
+
+		bp WININET!DllInstall @"$$>a<${$arg0} DllInstall 2";
+
+		bp kernelbase!OutputDebugStringA @"$$>a<${$arg0} OutputDebugStringA 1";
+		bp kernelbase!OutputDebugStringW @"$$>a<${$arg0} OutputDebugStringW 1";
+
+		bp kernel32!WinExec @"$$>a<${$arg0} WinExec 1";
+
+		bp SHELL32!ShellExecuteA @"$$>a<${$arg0} ShellExecuteA 3";
+		bp SHELL32!ShellExecuteW @"$$>a<${$arg0} ShellExecuteW 3";
+
+		bp KERNELBASE!CreateProcessA @"$$>a<${$arg0} CreateProcessA 1";
+		bp KERNELBASE!CreateProcessW @"$$>a<${$arg0} CreateProcessW 1";
+
+		sxi ld;
+		.leave;		
+	}
+	
+	.if @@masm(not($scmp("${$arg1}", "bind"))) { 
+		.printf /D "<col fg=\"srcnum\"><b>\n${$arg1}\n</b></col>";
+ 		r $t5 =  @@masm(hi(@@c++(((unsigned long *)(((unsigned long *)@$csp)[2]))[0])));
+ 		.printf /D "<col fg=\"srcspid\"><b>Port: </b></col>";
+ 		.printf /D "<col fg=\"srcspid\">%d\n\n</col>", @@masm(hi(@@c++((unsigned long *) (( @$t5 >> 24 ) | (( @$t5 << 8) & 0xff0000 ) | ((@$t5 >> 8) & 0xff00) | ( @$t5 << 24)))));
+ 		gc;
+ 		.leave;
+	}
+
+	.if @@masm($spat("${$arg1}", "*connect*")) {
+		.printf /D "<col fg=\"srcnum\"><b>\n${$arg1}\n</b></col>";
+		r? $t0 = @@c++(((unsigned long *)@$csp)[2]) + 4;
+		.printf /D "<col fg=\"srcspid\"><b>IP:   </b></col>";
+		.printf /D "<col fg=\"srcspid\">%d.%d.%d.%d\n</col>", @@c++(((unsigned char *)@$t0)[0]), @@c++(((unsigned char *)@$t0)[1]), @@c++(((unsigned char *)@$t0)[2]), @@c++(((unsigned char *)@$t0)[3])
+		
+		r $t5 =  @@masm(hi(@@c++(((unsigned long *)(((unsigned long *)@$csp)[2]))[0])));
+ 		.printf /D "<col fg=\"srcspid\"><b>Port: </b></col>";
+ 		.printf /D "<col fg=\"srcspid\">%d\n\n</col>", @@masm(hi(@@c++((unsigned long *) (( @$t5 >> 24 ) | (( @$t5 << 8) & 0xff0000 ) | ((@$t5 >> 8) & 0xff00) | ( @$t5 << 24)))));
+		gc;
+		.leave;
+	}
+
+	.if @@masm($spat("${$arg1}", "Reg*")) {
+		r $t6 = @@c++(((unsigned long *)@$csp)[2]);
+		r $t7 = @@masm(low(@@c++(((unsigned long *)@$csp)[1])));
+
+		.printf /D "<col fg=\"srckw\"><b>\n${$arg1}\n</b></col>";
+
+		.if @$t7 == 0x0 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_CLASSES_ROOT\n</col>";
+		}
+		.if @$t7 == 0x1 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_CURRENT_USER\n</col>";
+		}
+		.if @$t7 == 0x2 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_LOCAL_MACHINE\n</col>";
+		}
+		.if @$t7 == 0x3 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_USERS\n</col>";
+		}
+		.if @$t7 == 0x4 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_PERFORMANCE_DATA\n</col>";
+		}
+		.if @$t7 == 0x50 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_PERFORMANCE_TEXT\n</col>";
+		}
+		.if @$t7 == 0x60 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_PERFORMANCE_NLSTEXT\n</col>";
+		}
+		.if @$t7 == 0x5 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_CURRENT_CONFIG\n</col>";
+		}
+		.if @$t7 == 0x6 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_DYN_DATA\n</col>";
+		}
+		.if @$t7 == 0x7 {
+			.printf /D "<col fg=\"srcspid\"><b>HKEY</b>  : HKEY_CURRENT_USER_LOCAL_SETTINGS\n</col>";
+		}
+
+		.if @@masm($spat("${$arg1}", "*A")) {
+			.printf /D "<col fg=\"srcspid\"><b>Value</b>: %ma\n\n</col>", @$t6;
+			gc;
+		}
+
+		.if  @@masm($spat("${$arg1}", "*W")) {
+			.printf /D "<col fg=\"srcspid\"><b>Value</b>: %mu\n\n</col>", @$t6;
+			gc;
+		}
+		
+		.leave;
+	}
+	.printf /D "<col fg=\"emphfg\"><b>${$arg1}:  </b></col>"
+
+	r $t4 = @@c++(((unsigned long *)@$csp)[${$arg2}]);
+
+	.if @@masm($spat("${$arg1}", "*A")) {
+		
+		.printf /D "<col fg=\"srcspid\">%ma\n</col>", @$t4;
+		gc;
+	}
+
+	.if  @@masm($spat("${$arg1}", "*W")) {
+		.printf /D "<col fg=\"srcspid\">%mu\n</col>", @$t4;
+		gc;
+	}
+	
+}
