@@ -1,5 +1,5 @@
 # ApiMon
-A simple API monitor for Windbg
+This is a simple Windbg script to monitor common Win32 API calls and display the strings, IPs, Ports, Registry keys passed to the APIs. The Win32 API is huge and I have used common APIs used by malware. I coded this for fun :)
 
 ```
 Usage: ApiMon.wds run; g;
