@@ -112,8 +112,6 @@ aS LogPath @"C:\temp\Output.txt";
 		bp kernel32!CreateMutexA @"$$>a<${$arg0} CreateMutexA 3";
 		bp kernel32!CreateMutexW @"$$>a<${$arg0} CreateMutexW 3";
 
-		bp WININET!DllInstall @"$$>a<${$arg0} DllInstall 2";
-
 		bp kernelbase!OutputDebugStringA @"$$>a<${$arg0} OutputDebugStringA 1";
 		bp kernelbase!OutputDebugStringW @"$$>a<${$arg0} OutputDebugStringW 1";
 
